@@ -10,6 +10,7 @@ import {
 import { getFirestore } from 'firebase/firestore'
 import type { Movie } from '../types/movie'
 
+const USERS_COLLECTION = 'users'
 const FAVOURITES_COLLECTION = 'favourites'
 
 const firebaseConfig = {
@@ -32,13 +33,20 @@ function getErrorMessage(error: unknown): string {
   return error instanceof Error ? error.message : 'Unknown Firebase error'
 }
 
-export async function addFavourite(movie: Movie): Promise<void> {
+export async function addFavourite(userId: string, movie: Movie): Promise<void> {
+  if (!userId.trim()) {
+    throw new Error('Cannot add a favourite without a user ID')
+  }
+
   if (!movie.imdbID) {
     throw new Error('Cannot add a favourite without an imdbID')
   }
 
   try {
-    await set(ref(database, `${FAVOURITES_COLLECTION}/${movie.imdbID}`), movie)
+    await set(
+      ref(database, `${USERS_COLLECTION}/${userId}/${FAVOURITES_COLLECTION}/${movie.imdbID}`),
+      movie,
+    )
   } catch (error) {
     throw new Error(`Failed to add favourite movie: ${getErrorMessage(error)}`, {
       cause: error,
@@ -46,13 +54,19 @@ export async function addFavourite(movie: Movie): Promise<void> {
   }
 }
 
-export async function removeFavourite(imdbID: string): Promise<void> {
+export async function removeFavourite(userId: string, imdbID: string): Promise<void> {
+  if (!userId.trim()) {
+    throw new Error('Cannot remove a favourite without a user ID')
+  }
+
   if (!imdbID.trim()) {
     throw new Error('Cannot remove a favourite without an imdbID')
   }
 
   try {
-    await remove(ref(database, `${FAVOURITES_COLLECTION}/${imdbID}`))
+    await remove(
+      ref(database, `${USERS_COLLECTION}/${userId}/${FAVOURITES_COLLECTION}/${imdbID}`),
+    )
   } catch (error) {
     throw new Error(`Failed to remove favourite movie: ${getErrorMessage(error)}`, {
       cause: error,
@@ -60,9 +74,15 @@ export async function removeFavourite(imdbID: string): Promise<void> {
   }
 }
 
-export async function getFavourites(): Promise<Movie[]> {
+export async function getFavourites(userId: string): Promise<Movie[]> {
+  if (!userId.trim()) {
+    throw new Error('Cannot load favourites without a user ID')
+  }
+
   try {
-    const snapshot = await get(ref(database, FAVOURITES_COLLECTION))
+    const snapshot = await get(
+      ref(database, `${USERS_COLLECTION}/${userId}/${FAVOURITES_COLLECTION}`),
+    )
     const favourites = snapshot.val() as Record<string, Movie> | null
 
     return favourites ? Object.values(favourites) : []

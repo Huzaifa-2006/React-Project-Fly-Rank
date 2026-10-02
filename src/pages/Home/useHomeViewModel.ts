@@ -1,9 +1,13 @@
+import { useNavigate } from 'react-router-dom'
 import { useEffect, useState } from 'react'
+import { useAuthContext } from '../../context/useAuthContext'
 import { loadFavourites, saveFavourite } from '../Favourites/FavouritesModel'
 import { getMovies, initialMovies } from './HomeModel'
 import type { Movie } from '../../types/movie'
 
 export function useHomeViewModel(searchQuery = '') {
+  const navigate = useNavigate()
+  const { user } = useAuthContext()
   const [query, setQuery] = useState(searchQuery)
   const [movies, setMovies] = useState<Movie[]>([])
   const [favouriteIDs, setFavouriteIDs] = useState<Set<string>>(new Set())
@@ -20,7 +24,7 @@ export function useHomeViewModel(searchQuery = '') {
       try {
         const [results, favourites] = await Promise.all([
           searchQuery.trim() ? getMovies(searchQuery) : initialMovies(),
-          loadFavourites(),
+          user ? loadFavourites(user.uid) : Promise.resolve([]),
         ])
 
         if (active) {
@@ -44,7 +48,7 @@ export function useHomeViewModel(searchQuery = '') {
     return () => {
       active = false
     }
-  }, [searchQuery])
+  }, [searchQuery, user])
 
   async function handleSearch() {
     setLoading(true)
@@ -65,12 +69,26 @@ export function useHomeViewModel(searchQuery = '') {
     setError(null)
 
     try {
-      await saveFavourite(movie)
+      if (!user) {
+        navigate('/favourites')
+        return
+      }
+
+      await saveFavourite(user.uid, movie)
       setFavouriteIDs((currentIDs) => new Set(currentIDs).add(movie.imdbID))
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Failed to add favourite'
       setError(message)
     }
+  }
+
+  function handleFavouriteClick(movie: Movie) {
+    if (!user) {
+      navigate('/favourites')
+      return
+    }
+
+    void addFavourite(movie)
   }
 
   return {
@@ -81,6 +99,6 @@ export function useHomeViewModel(searchQuery = '') {
     error,
     favouriteIDs,
     handleSearch,
-    addFavourite,
+    handleFavouriteClick,
   }
 }

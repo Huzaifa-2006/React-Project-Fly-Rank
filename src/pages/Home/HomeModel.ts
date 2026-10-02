@@ -19,7 +19,7 @@ const INITIAL_SEARCH_KEYWORDS = [
   'Action',
 ]
 
-const INITIAL_KEYWORD_COUNT = 5
+const INITIAL_KEYWORD_COUNT = 6
 
 function shuffle<T>(items: T[]): T[] {
   const shuffledItems = [...items]
@@ -49,11 +49,11 @@ export async function initialMovies(): Promise<Movie[]> {
 
   const shuffledMovies = shuffle([...uniqueMovies.values()])
 
-  if (shuffledMovies.length < 20) {
-    throw new Error('Could not load 20 unique movies')
+  if (shuffledMovies.length < 30) {
+    throw new Error('Could not load 30 unique movies')
   }
 
-  return shuffledMovies.slice(0, 20)
+  return shuffledMovies.slice(0, 30)
 }
 
 export async function getMovies(query: string): Promise<Movie[]> {

@@ -7,19 +7,21 @@ A React and TypeScript movie browser powered by the OMDb API. Users can search f
 - Randomized movie selection on the Home page
 - Movie search through the header search form
 - Movie cards with poster, title, year, type, and favourite state
-- Favourite movies stored using Firebase Realtime Database
+- User-scoped favourite movies stored using Firebase Realtime Database
 - Favourites page with remove support
-- Firebase Authentication service and global auth context foundation
+- Email/password authentication with Firebase Authentication
+- Global authentication context with session restoration
+- Protected favourites route
 - TypeScript, ESLint, and Vite development workflow
 
-Authentication UI and route protection are not enabled yet.
+The Home page is publicly accessible. Favourites require authentication, and signed-out users are redirected to the Auth page.
 
 ## Requirements
 
 - Node.js
 - npm
 - An OMDb API key
-- A Firebase web app with Realtime Database enabled
+- A Firebase web app with Email/Password Authentication and Realtime Database enabled
 
 ## Getting Started
 
@@ -82,6 +84,35 @@ VITE_OMDB_API_KEY=your_omdb_api_key
 
 Firebase Realtime Database rules must allow the operations required by the current application configuration.
 
+Enable **Email/Password** under Firebase Authentication in the Firebase console before registering or logging in.
+
+## Authentication
+
+The Auth page supports:
+
+- Creating an account with an email address and password
+- Logging in with an existing account
+- Switching between Login and Create Account modes
+- Logging out from the navigation bar
+
+Authentication is handled through Firebase Authentication. The global `AuthProvider` listens for session changes and exposes the current user to the application.
+
+Routing behavior:
+
+- `/` is public
+- `/auth` redirects authenticated users to `/`
+- `/favourites` redirects unauthenticated users to `/auth`
+
+## Favourite Data
+
+Favourite movies are stored per authenticated user in Realtime Database using this structure:
+
+```text
+users/{userId}/favourites/{imdbID}
+```
+
+Firebase Authentication provides the `userId`. The application does not read `auth.currentUser` from the data service; the authenticated ID is passed explicitly through the model and view-model layers.
+
 ## Project Structure
 
 ```text
@@ -105,5 +136,5 @@ The project follows a lightweight MVVM structure for page-specific logic:
 ## Data Services
 
 - `omdbMovieService.ts` communicates with the OMDb API.
-- `firebaseService.ts` initializes Firebase Auth, Cloud Firestore, and Realtime Database. Favourite data currently uses Realtime Database.
+- `firebaseService.ts` initializes Firebase Auth, Cloud Firestore, and Realtime Database. Favourite data uses Realtime Database.
 - `authService.ts` contains Firebase Authentication operations.

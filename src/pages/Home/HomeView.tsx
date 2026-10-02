@@ -6,7 +6,7 @@ import './HomeView.css'
 function HomeView() {
   const [searchParams] = useSearchParams()
   const searchQuery = searchParams.get('query') ?? ''
-  const { movies, loading, error, favouriteIDs, addFavourite } =
+  const { movies, loading, error, favouriteIDs, handleFavouriteClick } =
     useHomeViewModel(searchQuery)
 
   return (
@@ -20,7 +20,7 @@ function HomeView() {
             key={movie.imdbID}
             movie={movie}
             isFavourite={favouriteIDs.has(movie.imdbID)}
-            onFavouriteClick={() => addFavourite(movie)}
+            onFavouriteClick={() => handleFavouriteClick(movie)}
           />
         ))}
       </ul>
