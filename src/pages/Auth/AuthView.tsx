@@ -1,4 +1,5 @@
 import { useAuthViewModel } from './useAuthViewModel'
+import './AuthView.css'
 
 function AuthView() {
   const {

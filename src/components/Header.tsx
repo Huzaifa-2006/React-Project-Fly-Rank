@@ -1,9 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuthContext } from '../context/useAuthContext'
 import './Header.css'
 
 function Header() {
   const navigate = useNavigate()
+  const { user, logout } = useAuthContext()
   const [query, setQuery] = useState('')
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -24,19 +26,32 @@ function Header() {
             Favourites
           </Link>
         </nav>
-        <form className="header__search" onSubmit={handleSubmit}>
-          <input
-            type="search"
-            className="header__input"
-            value={query}
-            onChange={(event) => setQuery(event.target.value)}
-            placeholder="Search movies…"
-            aria-label="Search"
-          />
-          <button type="submit" className="header__button">
-            Search
-          </button>
-        </form>
+        <div className="header__actions">
+          <form className="header__search" onSubmit={handleSubmit}>
+            <input
+              type="search"
+              className="header__input"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search movies…"
+              aria-label="Search"
+            />
+            <button type="submit" className="header__button">
+              Search
+            </button>
+          </form>
+          {user && (
+            <button
+              type="button"
+              className="header__logout"
+              onClick={() => {
+                void logout().then(() => navigate('/'))
+              }}
+            >
+              Logout
+            </button>
+          )}
+        </div>
       </div>
     </header>
   )
