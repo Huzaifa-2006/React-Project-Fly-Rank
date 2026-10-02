@@ -1,75 +1,109 @@
-# React + TypeScript + Vite
+# Movie Explorer
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React and TypeScript movie browser powered by the OMDb API. Users can search for movies, browse a randomized selection on the Home page, and save movies as favourites in Firebase Realtime Database.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+- Randomized movie selection on the Home page
+- Movie search through the header search form
+- Movie cards with poster, title, year, type, and favourite state
+- Favourite movies stored using Firebase Realtime Database
+- Favourites page with remove support
+- Firebase Authentication service and global auth context foundation
+- TypeScript, ESLint, and Vite development workflow
 
-## React Compiler
+Authentication UI and route protection are not enabled yet.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Requirements
 
-## Expanding the ESLint configuration
+- Node.js
+- npm
+- An OMDb API key
+- A Firebase web app with Realtime Database enabled
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Getting Started
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+Install dependencies:
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+Create a local environment file from the example:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-
+```bash
+copy .env.example .env
 ```
+
+Add the OMDb key to `.env`:
+
+```env
+VITE_OMDB_API_KEY=your_omdb_api_key
+```
+
+Fill in the Firebase values in `.env` using the configuration from your Firebase web app. Never commit `.env` or real API keys.
+
+Start the development server:
+
+```bash
+npm run dev
+```
+
+Vite will print the local URL in the terminal.
+
+## Available Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Vite development server |
+| `npm run build` | Type-check and create a production build |
+| `npm run lint` | Run ESLint |
+| `npm run preview` | Preview the production build locally |
+
+## Environment Variables
+
+The application uses Vite environment variables. Required Firebase variables are listed in `.env.example`:
+
+```env
+VITE_FIREBASE_API_KEY=your_firebase_api_key
+VITE_FIREBASE_AUTH_DOMAIN=your-project.firebaseapp.com
+VITE_FIREBASE_DATABASE_URL=https://your-project-default-rtdb.region.firebasedatabase.app
+VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
+VITE_FIREBASE_STORAGE_BUCKET=your-project.firebasestorage.app
+VITE_FIREBASE_MESSAGING_SENDER_ID=your_messaging_sender_id
+VITE_FIREBASE_APP_ID=your_firebase_app_id
+```
+
+Also add:
+
+```env
+VITE_OMDB_API_KEY=your_omdb_api_key
+```
+
+Firebase Realtime Database rules must allow the operations required by the current application configuration.
+
+## Project Structure
+
+```text
+src/
+  components/       Shared UI components, including Header and MovieCard
+  context/          Global application contexts, including authentication
+  pages/
+    Auth/           Authentication model, view model, and view foundation
+    Favourites/     Favourite movie model, view model, and view
+    Home/           Movie loading, search, and home view
+  services/         OMDb, Firebase, and authentication integrations
+  types/            Shared TypeScript types
+```
+
+The project follows a lightweight MVVM structure for page-specific logic:
+
+- **Model:** API and service-facing operations
+- **View model:** React state and user actions
+- **View:** Presentational React components
+
+## Data Services
+
+- `omdbMovieService.ts` communicates with the OMDb API.
+- `firebaseService.ts` initializes Firebase Auth, Cloud Firestore, and Realtime Database. Favourite data currently uses Realtime Database.
+- `authService.ts` contains Firebase Authentication operations.

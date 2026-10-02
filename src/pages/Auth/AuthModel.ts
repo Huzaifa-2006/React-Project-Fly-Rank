@@ -5,17 +5,6 @@ import {
 } from '../../services/authService'
 import type { User } from 'firebase/auth'
 
-export type AuthCredentials = {
-  email: string
-  password: string
-}
-
-export type AuthState = {
-  user: null
-  loading: boolean
-  error: string | null
-}
-
 function validateCredentials(email: string, password: string): string {
   if (!email.trim()) {
     return 'Email is required.'
