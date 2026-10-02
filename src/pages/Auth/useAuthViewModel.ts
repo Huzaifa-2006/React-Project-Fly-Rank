@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import * as AuthModel from './AuthModel'
-
-export type AuthMode = 'login' | 'register'
+import type { AuthMode } from '../../types/auth'
 
 export function useAuthViewModel() {
   const [email, setEmail] = useState('')

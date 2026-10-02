@@ -1,22 +1,13 @@
 import {
-  createContext,
-  useContext,
   useEffect,
   useState,
-  type PropsWithChildren,
 } from 'react'
 import type { User } from 'firebase/auth'
 import { logoutUser, subscribeToAuthChanges } from '../services/authService'
+import type { AuthProviderProps } from '../types/auth'
+import { AuthContext } from './authContextInstance'
 
-type AuthContextValue = {
-  user: User | null
-  authLoading: boolean
-  logout: () => Promise<void>
-}
-
-const AuthContext = createContext<AuthContextValue | undefined>(undefined)
-
-export function AuthProvider({ children }: PropsWithChildren) {
+export function AuthProvider({ children }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null)
   const [authLoading, setAuthLoading] = useState(true)
 
@@ -44,12 +35,3 @@ export function AuthProvider({ children }: PropsWithChildren) {
   )
 }
 
-export function useAuthContext(): AuthContextValue {
-  const context = useContext(AuthContext)
-
-  if (!context) {
-    throw new Error('useAuthContext must be used within an AuthProvider')
-  }
-
-  return context
-}
