@@ -15,6 +15,20 @@ function Header() {
     navigate(trimmedQuery ? `/?query=${encodeURIComponent(trimmedQuery)}` : '/')
   }
 
+  async function handleAuthAction() {
+    if (!user) {
+      navigate('/auth')
+      return
+    }
+
+    try {
+      await logout()
+      navigate('/')
+    } catch (error) {
+      console.error('Logout failed:', error)
+    }
+  }
+
   return (
     <header className="header">
       <div className="header__inner">
@@ -40,17 +54,15 @@ function Header() {
               Search
             </button>
           </form>
-          {user && (
-            <button
-              type="button"
-              className="header__logout"
-              onClick={() => {
-                void logout().then(() => navigate('/'))
-              }}
-            >
-              Logout
-            </button>
-          )}
+          <button
+            type="button"
+            className="header__logout"
+            onClick={() => {
+              void handleAuthAction()
+            }}
+          >
+            {user ? 'Logout' : 'Login'}
+          </button>
         </div>
       </div>
     </header>
